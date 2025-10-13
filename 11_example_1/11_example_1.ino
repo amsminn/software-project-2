@@ -56,8 +56,6 @@ void setup() {
 }
 
 void loop() {
-  while(!Serial.available());
-
   float  dist_raw, dist_filtered;
   
   // wait until next sampling time.
@@ -85,27 +83,23 @@ void loop() {
   // adjust servo position according to the USS read value
   // add your code here!
   
-  int a = Serial.parseInt();
-  if (a == 1) {
-    // left
-    cur_duty = cur_duty - 10;
-  } else if (a == 2) {
-    cur_duty = cur_duty + 10;
-  } else if (a == 0) {
-    exit(0);
+  if (dist_ema < _TARGET_LOW) {
+    cur_duty = 540;
+  } else if (dist_ema > _TARGET_HIGH) {
+    cur_duty = 2390;
+  } else {
+    cur_duty = (540 + 2390) / 2;
   }
-
   myservo.writeMicroseconds(cur_duty);
-  Serial.println(cur_duty);
 
-  // output the distance to the serial port
-//   Serial.print("Min:");    Serial.print(_DIST_MIN);
-//   Serial.print(",Low:");   Serial.print(_TARGET_LOW);
-//   Serial.print(",dist:");  Serial.print(dist_raw);
-//   Serial.print(",Servo:"); Serial.print(myservo.read());  
-//   Serial.print(",High:");  Serial.print(_TARGET_HIGH);
-//   Serial.print(",Max:");   Serial.print(_DIST_MAX);
-//   Serial.println("");
+//   output the distance to the serial port
+  Serial.print("Min:");    Serial.print(_DIST_MIN);
+  Serial.print(",Low:");   Serial.print(_TARGET_LOW);
+  Serial.print(",dist:");  Serial.print(dist_raw);
+  Serial.print(",Servo:"); Serial.print(myservo.read());  
+  Serial.print(",High:");  Serial.print(_TARGET_HIGH);
+  Serial.print(",Max:");   Serial.print(_DIST_MAX);
+  Serial.println("");
  
   // update last sampling time
   last_sampling_time += INTERVAL;
